@@ -20,6 +20,8 @@ class _ClientReclamationsScreenState extends State<ClientReclamationsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Mes Réclamations'),
+        backgroundColor: Color(0xFFF40000),
+        foregroundColor: Colors.white,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _getClientReclamations(),

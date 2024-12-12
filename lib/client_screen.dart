@@ -7,6 +7,12 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'reclamation_form.dart';
+import 'package:reclamation/client_reclamation_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:reclamation/avis_client.dart';
+import 'package:reclamation/edit_profile_client.dart';
+import 'package:reclamation/chat_screen.dart';
 
 class ClientScreen extends StatefulWidget {
   @override
@@ -14,6 +20,7 @@ class ClientScreen extends StatefulWidget {
 }
 
 class _ClientScreenState extends State<ClientScreen> {
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   LatLng _currentPosition = LatLng(12.9716, 77.5946); // Position initiale par défaut
   bool _isLocationFetched = false;
   bool _isLocationError = false;
@@ -28,6 +35,7 @@ class _ClientScreenState extends State<ClientScreen> {
   @override
   void initState() {
     super.initState();
+    _initializeFCM();
     _requestPermissions();
     _getCurrentLocation();
     _fetchAgentPositions();
@@ -38,6 +46,45 @@ class _ClientScreenState extends State<ClientScreen> {
     await Permission.location.request();
     await Permission.phone.request();
     await Permission.sms.request();
+  }
+
+  Future<void> _initializeFCM() async {
+    try {
+      NotificationSettings settings = await _firebaseMessaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        await _updateFCMToken();
+        _firebaseMessaging.onTokenRefresh.listen((newToken) async {
+          await _updateFCMToken(newToken);
+        });
+
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('📩 ${message.notification?.title ?? 'Message reçu'}')),
+          );
+        });
+      }
+    } catch (e) {
+      print("Erreur d'initialisation FCM: $e");
+    }
+  }
+
+  Future<void> _updateFCMToken([String? newToken]) async {
+    try {
+      String? token = newToken ?? await _firebaseMessaging.getToken();
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null && token != null) {
+        await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).set({
+          'fcmToken': token,
+        }, SetOptions(merge: true));
+      }
+    } catch (e) {
+      print("Erreur de mise à jour du jeton FCM: $e");
+    }
   }
 
   // Fonction pour obtenir la position actuelle
@@ -192,7 +239,7 @@ class _ClientScreenState extends State<ClientScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Carte Client'),
-        backgroundColor: Colors.red,
+        backgroundColor: Color(0xFFF40000),
         foregroundColor: Colors.white,
       ),
       drawer: Drawer(
@@ -200,8 +247,42 @@ class _ClientScreenState extends State<ClientScreen> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.red),
+              decoration: BoxDecoration(color: Color(0xFFF40000)),
               child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
+            ),
+            ListTile(
+              leading: Icon(Icons.assignment),
+              title: Text('Mes réclamations'),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => ClientReclamationsScreen()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.comment),
+              title: Text('Avis '),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => ReviewScreen()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.mark_chat_unread),
+              title: Text('Chat'),
+              onTap: () {
+                // Naviguer vers la page UserListScreen avec l'ID de l'utilisateur actuel
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(),  // Assurez-vous que UserListScreen est bien importé
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Modifier Profil'),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => EditProfileClientScreen()));
+              },
             ),
             ListTile(
               leading: Icon(Icons.logout),
@@ -259,6 +340,15 @@ class _ClientScreenState extends State<ClientScreen> {
               ),
             ),
           ),
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: _getCurrentLocation,
+              child: Icon(Icons.my_location),
+              backgroundColor: Colors.blue,
+            ),
+          ),
         ],
       )
           : Center(
@@ -269,5 +359,3 @@ class _ClientScreenState extends State<ClientScreen> {
     );
   }
 }
-
-

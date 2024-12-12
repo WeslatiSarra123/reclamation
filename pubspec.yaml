@@ -49,6 +49,11 @@ dependencies:
   chat_gpt_sdk: ^2.2.5
   intl: ^0.19.0
   firebase_messaging: ^15.1.5
+  image_picker: ^1.1.2
+  firebase_storage: ^12.3.6
+  firebase_app_check: ^0.3.1+6
+
+
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +74,7 @@ flutter:
   assets:
     - assets/images/ooredoo_logo.png
     - assets/images/openai_icon.png
+    - assets/images/default_avatar.jpg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
+
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -13,7 +17,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
   String _role = 'client'; // Valeur par défaut pour le rôle
-
   final _formKey = GlobalKey<FormState>();
 
   // Fonction pour créer un nouvel utilisateur et ajouter les détails dans Firestore
@@ -38,13 +41,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
           'email': email,
           'phone': _phoneController.text,
           'role': _role,
+          'image': 'assets/images/profile_default.jpg',
         });
 
         // Affichage d'un message de succès ou navigation
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Inscription réussie")));
-        //Navigator.pushReplacementNamed(context, '/home'); // Navigation vers un écran principal
+        // Attendez un court instant pour que l'utilisateur puisse voir le message
+        Future.delayed(Duration(seconds: 2), () {
+          Navigator.pushReplacementNamed(context, '/login');
+        });
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur: ${e.toString()}")));
       }
     }
   }
@@ -53,7 +60,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Créer un compte', style: TextStyle(fontFamily: 'Ooredoo', fontWeight: FontWeight.bold,color: Colors.white, )),
+        title: Text('Créer un compte', style: TextStyle(fontFamily: 'Ooredoo', fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: Color(0xFFF40000), // Couleur inspirée d'Ooredoo
       ),
       body: Padding(
@@ -76,7 +83,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   controller: _nameController,
                   decoration: InputDecoration(
                     labelText: 'Nom',
-                    labelStyle: TextStyle(color: Colors.red),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.red),
                     ),
@@ -101,7 +107,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   controller: _emailController,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    labelStyle: TextStyle(color: Colors.red),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.red),
                     ),
@@ -126,7 +131,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   controller: _passwordController,
                   decoration: InputDecoration(
                     labelText: 'Mot de passe',
-                    labelStyle: TextStyle(color: Colors.red),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.red),
                     ),
@@ -152,7 +156,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   controller: _phoneController,
                   decoration: InputDecoration(
                     labelText: 'Numéro de téléphone',
-                    labelStyle: TextStyle(color: Colors.red),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.red),
                     ),
@@ -172,7 +175,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
                 SizedBox(height: 16),
-
                 // Sélection du rôle
                 Text('Sélectionnez votre rôle:', style: TextStyle(color: Colors.red)),
                 Row(
@@ -213,7 +215,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     elevation: 5,
                   ),
-                  child: Text('S\'inscrire', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold , color: Colors.white,)),
+                  child: Text('S\'inscrire', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold , color: Colors.white)),
                 ),
                 SizedBox(height: 20),
 

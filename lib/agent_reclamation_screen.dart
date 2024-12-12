@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:reclamation/edit_profile.dart';
+import 'package:reclamation/avis_agent.dart';
+import 'package:reclamation/agent_screen.dart';
 
 class AgentReclamationsScreen extends StatefulWidget {
   @override
@@ -58,6 +62,57 @@ class _AgentReclamationsScreenState extends State<AgentReclamationsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Réclamations en attente'),
+        backgroundColor: Color(0xFFF40000),
+        foregroundColor: Colors.white,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(color: Color(0xFFF40000)),
+              child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
+            ),
+            ListTile(
+              leading: Icon(Icons.assignment),
+              title: Text('Réclamations'),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AgentReclamationsScreen()),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.star),
+              title: Text('Voir Avis '),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => ReviewsAgentScreen()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.home),
+              title: Text('Home'),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AgentScreen()),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Modifier Mes informations personnels'),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => EditProfileScreen()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Déconnexion'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacementNamed(context, '/login');
+              },
+            ),
+          ],
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _getReclamations(),
@@ -105,7 +160,7 @@ class _AgentReclamationsScreenState extends State<AgentReclamationsScreen> {
                             onPressed: () {
                               String clientToken = reclamation['clientToken']; // Récupérer le token du client
                               _updateReclamationStatus(reclamation.id, 'Refusée', clientToken);
-                              Navigator.pop(context); // Fermer le dialogue
+                              Navigator.pop(context);
                             },
                             child: Text('Refuser'),
                           ),

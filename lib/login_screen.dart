@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -14,7 +14,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
 
   // Fonction de connexion classique
   void _login() async {
@@ -90,9 +89,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Connexion"),
+      appBar: AppBar(
+        title: Text('Connexion', style: TextStyle(fontFamily: 'Ooredoo', fontWeight: FontWeight.bold, color: Colors.white)),
+        backgroundColor: Color(0xFFF40000), // Couleur inspirée d'Ooredoo
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
@@ -180,6 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (_emailController.text.isEmpty || !_emailController.text.contains('@')) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Veuillez entrer une adresse e-mail valide.')),
+
                     );
                     return;
                   }
@@ -187,10 +189,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('E-mail de réinitialisation envoyé !')),
+
                     );
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Erreur : ${e.toString()}')),
+
                     );
                   }
                 },
@@ -225,17 +229,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-              Container(
-                alignment: Alignment.centerRight, // Aligner à droite
-                child: IconButton(
-                  icon: SizedBox(
-                    width: 40,  // Largeur de l'icône
-                    height: 40, // Hauteur de l'icône
-                    child: Image.asset('assets/images/openai_icon.png'),
+              // Rendre le bouton adaptable au clavier
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                  child: IconButton(
+                    icon: SizedBox(
+                      width: 30,  // Largeur de l'icône
+                      height: 30, // Hauteur de l'icône
+                      child: Image.asset('assets/images/openai_icon.png'),
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/chatScreen');
+                    },
                   ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/chatScreen');
-                  },
                 ),
               ),
             ],
