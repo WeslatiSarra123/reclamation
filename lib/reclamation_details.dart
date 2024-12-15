@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server/gmail.dart';
 import 'package:http/http.dart' as http;
+import 'package:reclamation/constant.dart';
+import 'dart:convert';
 
 class ReclamationDetailsScreen extends StatelessWidget {
   final QueryDocumentSnapshot reclamation;
