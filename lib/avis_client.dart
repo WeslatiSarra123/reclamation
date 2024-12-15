@@ -150,7 +150,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
             ListTile(
               leading: Icon(Icons.assignment),
               title: Text('Mes réclamations'),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ClientReclamationsScreen())),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => MesReclamationsPage()));
+              },
             ),
             ListTile(
               leading: Icon(Icons.star),

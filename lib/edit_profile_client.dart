@@ -107,7 +107,9 @@ class _EditProfileClientScreenState extends State<EditProfileClientScreen> {
             ListTile(
               leading: Icon(Icons.assignment),
               title: Text('Mes réclamations'),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ClientReclamationsScreen())),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => MesReclamationsPage()));
+                },
             ),
             ListTile(
               leading: Icon(Icons.star),

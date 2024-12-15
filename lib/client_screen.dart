@@ -7,12 +7,12 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'reclamation_form.dart';
-import 'package:reclamation/client_reclamation_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:reclamation/avis_client.dart';
 import 'package:reclamation/edit_profile_client.dart';
 import 'package:reclamation/chat_screen.dart';
+import 'package:reclamation/client_reclamation_screen.dart';
 
 class ClientScreen extends StatefulWidget {
   @override
@@ -20,6 +20,7 @@ class ClientScreen extends StatefulWidget {
 }
 
 class _ClientScreenState extends State<ClientScreen> {
+  String? clientId; // Déclare clientId
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   LatLng _currentPosition = LatLng(12.9716, 77.5946); // Position initiale par défaut
   bool _isLocationFetched = false;
@@ -35,6 +36,10 @@ class _ClientScreenState extends State<ClientScreen> {
   @override
   void initState() {
     super.initState();
+    final user = FirebaseAuth.instance.currentUser;
+    setState(() {
+      clientId = user?.uid; // Maintenant, clientId est disponible
+    });
     _initializeFCM();
     _requestPermissions();
     _getCurrentLocation();
@@ -134,6 +139,7 @@ class _ClientScreenState extends State<ClientScreen> {
   }
 
   // Fonction pour récupérer les positions des agents depuis Firestore
+  // Fonction pour récupérer les positions des agents depuis Firestore
   Future<void> _fetchAgentPositions() async {
     try {
       QuerySnapshot querySnapshot =
@@ -159,6 +165,7 @@ class _ClientScreenState extends State<ClientScreen> {
       print("Erreur lors de la récupération des positions des agents : $e");
     }
   }
+
 
   // Gestion des appels téléphoniques
   Future<void> _makePhoneCall(String phone) async {
@@ -196,12 +203,13 @@ class _ClientScreenState extends State<ClientScreen> {
       builder: (BuildContext context) {
         return Padding(
           padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: ReclamationForm(agentId: agentId),
+          child: ReclamationForm(agentId: agentId , clientId: clientId!),
         );
       },
     );
   }
 
+  // Menu des actions pour un agent sélectionné
   // Menu des actions pour un agent sélectionné
   void _showAgentActionMenu(BuildContext context, String phone, String agentId) {
     showModalBottomSheet(
@@ -254,7 +262,7 @@ class _ClientScreenState extends State<ClientScreen> {
               leading: Icon(Icons.assignment),
               title: Text('Mes réclamations'),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => ClientReclamationsScreen()));
+             Navigator.push(context, MaterialPageRoute(builder: (_) => MesReclamationsPage()));
               },
             ),
             ListTile(
@@ -268,7 +276,6 @@ class _ClientScreenState extends State<ClientScreen> {
               leading: Icon(Icons.mark_chat_unread),
               title: Text('Chat'),
               onTap: () {
-                // Naviguer vers la page UserListScreen avec l'ID de l'utilisateur actuel
                 Navigator.push(
                   context,
                   MaterialPageRoute(

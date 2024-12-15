@@ -5,6 +5,8 @@ import 'package:reclamation/agent_reclamation_screen.dart';
 import 'package:reclamation/edit_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reclamation/chat_screen.dart';
+import 'package:reclamation/historique.dart';
+import 'package:reclamation/agent_screen.dart';
 class ReviewsAgentScreen extends StatefulWidget {
   @override
   _ReviewsAgentScreenState createState() => _ReviewsAgentScreenState();
@@ -56,8 +58,28 @@ class _ReviewsAgentScreenState extends State<ReviewsAgentScreen> {
               },
             ),
             ListTile(
+              leading: Icon(Icons.home),
+              title: Text('Accueil'),
+              onTap: () {
+                // Naviguer vers la page UserListScreen avec l'ID de l'utilisateur actuel
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AgentScreen(),  // Assurez-vous que UserListScreen est bien importé
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.history),
+              title: Text('Historique'),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => AgentReclamationHistoriquesScreen()));
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.settings),
-              title: Text('Modifier Mes informations personnels'),
+              title: Text('Modifier Profil'),
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => EditProfileScreen()));
               },

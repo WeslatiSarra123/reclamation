@@ -4,15 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reclamation/edit_profile.dart';
 import 'package:reclamation/avis_agent.dart';
 import 'package:reclamation/agent_screen.dart';
-import 'package:reclamation/reclamation_details.dart';
-import 'package:reclamation/historique.dart';
-import 'package:reclamation/chat_screen.dart';
-class AgentReclamationsScreen extends StatefulWidget {
+import 'package:reclamation/reclamation_details_historique.dart';
+import 'package:reclamation/agent_reclamation_screen.dart';
+class AgentReclamationHistoriquesScreen extends StatefulWidget {
   @override
-  _AgentReclamationsScreenState createState() => _AgentReclamationsScreenState();
+  _AgentReclamationHistoriquesScreenState createState() => _AgentReclamationHistoriquesScreenState();
 }
 
-class _AgentReclamationsScreenState extends State<AgentReclamationsScreen> {
+class _AgentReclamationHistoriquesScreenState extends State<AgentReclamationHistoriquesScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -23,7 +22,7 @@ class _AgentReclamationsScreenState extends State<AgentReclamationsScreen> {
     }
     return _firestore
         .collection('reclamations')
-        .where('status', isEqualTo: 'En attente')
+        .where('status', isEqualTo: 'Terminé')
         .where('agentId', isEqualTo: currentUser.uid)
         .snapshots();
   }
@@ -32,7 +31,7 @@ class _AgentReclamationsScreenState extends State<AgentReclamationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Réclamations en attente'),
+        title: Text('Historique'),
         backgroundColor: Color(0xFFF40000),
         foregroundColor: Colors.white,
       ),
@@ -49,7 +48,7 @@ class _AgentReclamationsScreenState extends State<AgentReclamationsScreen> {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('Aucune réclamation en attente', style: TextStyle(fontSize: 16)));
+            return Center(child: Text('Aucune réclamation terminé', style: TextStyle(fontSize: 16)));
           }
 
           var reclamations = snapshot.data!.docs;
@@ -90,7 +89,7 @@ class _AgentReclamationsScreenState extends State<AgentReclamationsScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ReclamationDetailsScreen(reclamation: reclamation),
+                          builder: (context) => ReclamationDetailsHistoriqueScreen(reclamation: reclamation),
                         ),
                       );
                     },
@@ -119,14 +118,11 @@ class _AgentReclamationsScreenState extends State<AgentReclamationsScreen> {
           _buildDrawerItem(Icons.star, 'Voir Avis', () {
             Navigator.push(context, MaterialPageRoute(builder: (_) => ReviewsAgentScreen()));
           }),
-          _buildDrawerItem(Icons.history, 'Historique', () {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => AgentReclamationHistoriquesScreen()));
-          }),
-          _buildDrawerItem(Icons.assignment, 'Chat', () {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen()));
-          }),
           _buildDrawerItem(Icons.home, 'Accueil', () {
             Navigator.push(context, MaterialPageRoute(builder: (_) => AgentScreen()));
+          }),
+          _buildDrawerItem(Icons.assignment, 'Historique', () {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => AgentReclamationHistoriquesScreen()));
           }),
           _buildDrawerItem(Icons.settings, 'Modifier Mes Informations', () {
             Navigator.push(context, MaterialPageRoute(builder: (_) => EditProfileScreen()));
@@ -148,10 +144,3 @@ class _AgentReclamationsScreenState extends State<AgentReclamationsScreen> {
     );
   }
 }
-
-
-
-
-
-
-

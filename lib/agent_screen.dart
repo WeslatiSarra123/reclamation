@@ -10,7 +10,8 @@ import 'package:reclamation/agent_reclamation_screen.dart';
 import 'package:reclamation/edit_profile.dart';
 import 'package:reclamation/avis_agent.dart';
 import 'package:reclamation/chat_screen.dart';
-
+import 'package:reclamation/historique.dart';
+import 'package:reclamation/add_transaction.dart';
 class AgentScreen extends StatefulWidget {
   @override
   _AgentScreenState createState() => _AgentScreenState();
@@ -28,6 +29,13 @@ class _AgentScreenState extends State<AgentScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialisation de FirebaseMessaging et écoute des messages
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      // Afficher une SnackBar ou gérer la notification comme souhaité
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('📩 ${message.notification?.title ?? 'Message reçu'}')),
+      );
+    });
     _initializeFCM();
     _getCurrentLocation();
     _loadAgentLocations();
@@ -230,6 +238,24 @@ class _AgentScreenState extends State<AgentScreen> {
                   builder: (context) => ChatScreen(),  // Assurez-vous que UserListScreen est bien importé
                 ),
               );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.add),
+            title: Text('Add Transaction'),
+            onTap: () {
+              // Naviguer vers le formulaire de la transaction
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => TransactionForm()), // Appel du formulaire
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.history),
+            title: Text('Historique'),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => AgentReclamationHistoriquesScreen()));
             },
           ),
           ListTile(
