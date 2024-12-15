@@ -123,6 +123,7 @@ class ReclamationDetailsScreen extends StatelessWidget {
             child: Text('Annuler'),
           ),
         ],
+
       ),
     );
   }
